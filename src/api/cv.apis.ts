@@ -32,6 +32,8 @@ export const useCV = () => {
     localStorage.removeItem("isFreeCoupon");
     localStorage.removeItem("nanoId");
     localStorage.removeItem("qualificationAnswered");
+    localStorage.removeItem("hashArray");
+    localStorage.removeItem("txStatus");
     return response.json();
   };
 

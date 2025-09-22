@@ -337,7 +337,6 @@ export function AnimatedVerification({
                 <UploadProofButton
                   col
                   className="-ml-7 text-xs sm:text-base sm:ml-0"
-                  isUploaded={(verificationData.proof || []).length > 0}
                   ipfsHash={ipfsHash}
                 />
               }
@@ -346,7 +345,6 @@ export function AnimatedVerification({
               <UploadProofButton
                   col
                   className="-ml-7 text-xs sm:text-base sm:ml-0 -mt-3"
-                  isUploaded={(verificationData.proof || []).length > 0}
                   ipfsHash={ipfsHash}
                 />
               }

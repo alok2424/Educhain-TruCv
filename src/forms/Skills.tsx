@@ -40,8 +40,9 @@ const skills: string[] = [
 // };
 
 const Skills = () => {
+  const { control, setValue, getValues } = useFormContext();
   const {
-    selectedSkills,
+    // selectedSkills,
     setSelectedSkills,
     skillError,
     setSkillError,
@@ -52,23 +53,37 @@ const Skills = () => {
   } = useCvFromContext();
   const [typerSkill, setTyperSkill] = useState<string>("");
   const [isKeyDown, setIsKeyDown] = useState<boolean>(false);
-  const { control, setValue, getValues } = useFormContext();
-  // const [skillsVerification, setSkillsVerification] =
-  //   useState<SkillsVerificationType>({});
-  // console.log(skillError);
+
   console.log("skills verification", skillsVerification);
   console.log("form object", getValues());
-  const { skillsVerificationsValidations: storedVerification } = getValues();
 
+  const {
+    skillsVerificationsValidations: storedVerification,
+    Skills: formSkills,
+  } = getValues();
+
+  const localItem = JSON.parse(localStorage.getItem("step4CvData") || "{}");
+  console.log(
+    "stored skills verifications",
+    localItem.skillsVerificationsValidations
+  );
   const selectSkillsHandler = (skill: string) => {
-    if (!selectedSkills.includes(skill)) {
-      if (selectedSkills.length >= 5) {
+    // Check if skill already exists by looking at skillName property
+    const skillExists = formSkills.some(
+      (selectedSkill: any) => selectedSkill.skillName === skill
+    );
+
+    if (!skillExists) {
+      if (formSkills.length >= 5) {
         setSkillShowError(true);
         setSkillError("You can only select 5 skills");
         return;
       }
-      setSelectedSkills((prev) => [...prev, skill]);
-      setValue("Skills", [...selectedSkills, skill]);
+      setSelectedSkills((prev) => [
+        ...prev,
+        { skillName: skill, skillUrl: "" },
+      ]);
+      setValue("Skills", [...formSkills, { skillName: skill, skillUrl: "" }]);
       const updatedSKillsVerifications = {
         ...skillsVerification,
         [skill]: {
@@ -79,25 +94,21 @@ const Skills = () => {
       };
       // setting skills verification object;
       setSkillsVerification(updatedSKillsVerifications);
-      // setSkillsVerification((prev) => ({
-      //   ...prev,
-      //   [skill]: {
-      //     isSelfAttested: false,
-      //     proof: "",
-      //     mailStatus: "",
-      //   },
-      // }));
+
       setValue("skillsVerifications", updatedSKillsVerifications);
       return;
     }
 
     setSelectedSkills((prev) =>
-      prev.filter((prevSkill) => prevSkill !== skill)
+      prev.filter((prevSkill) => prevSkill.skillName !== skill)
     );
-    const filteredSkills = selectedSkills.filter(
-      (prevSkill) => prevSkill !== skill
+    // const filteredSkills = selectedSkills.filter(
+    //   (prevSkill) => prevSkill !== skill
+    // );
+    const formFilteredSkills = formSkills.filter(
+      (prevSkill: any) => prevSkill.skillName !== skill
     );
-    setValue("Skills", filteredSkills);
+    setValue("Skills", formFilteredSkills);
     setSkillsVerification((prev) => {
       let updatedSkillsVerifications = { ...prev };
       delete updatedSkillsVerifications[skill];
@@ -108,16 +119,19 @@ const Skills = () => {
 
   const removeSkillHandler = (skill: string) => {
     setSelectedSkills((prev) =>
-      prev.filter((prevSkill) => prevSkill !== skill)
+      prev.filter((prevSkill) => prevSkill.skillName !== skill)
     );
-    const filteredSkills = selectedSkills.filter(
-      (prevSkill) => prevSkill !== skill
+    const formFilteredSkill = formSkills.filter(
+      (prevSkill: any) => prevSkill.skillName !== skill
+    );
+    const filteredSkills = formFilteredSkill.filter(
+      (prevSkill: any) => prevSkill.skillName !== skill
     );
     if (filteredSkills.length < 5) {
       setSkillShowError(false);
       setSkillError("");
     }
-    setValue("Skills", filteredSkills);
+    setValue("Skills", formFilteredSkill);
     // remove from the sKillsVerificationObject;
     setSkillsVerification((prev) => {
       let updatedSkillsVerification = { ...prev };
@@ -133,15 +147,21 @@ const Skills = () => {
       setIsKeyDown(true);
     } else if (e.key === "Enter") {
       e.preventDefault();
-      if (selectedSkills.length >= 5) {
+      if (formSkills.length >= 5) {
         setTyperSkill("");
         setSkillShowError(true);
         setSkillError("You can only add 5 skills");
         return;
       }
 
-      setSelectedSkills((prev) => [...prev, typerSkill]);
-      setValue("Skills", [...selectedSkills, typerSkill]);
+      setSelectedSkills((prev) => [
+        ...prev,
+        { skillName: typerSkill, skillUrl: "" },
+      ]);
+      setValue("Skills", [
+        ...formSkills,
+        { skillName: typerSkill, skillUrl: "" },
+      ]);
       const updatedSkillsVerifications = {
         ...skillsVerification,
         [typerSkill]: {
@@ -159,13 +179,19 @@ const Skills = () => {
   };
 
   const typeSkillClickHanlder = () => {
-    if (selectedSkills.length >= 5) {
+    if (formSkills.length >= 5) {
       setSkillShowError(true);
       setSkillError("You can only add 5 skills");
       return;
     }
-    setSelectedSkills((prev) => [...prev, typerSkill]);
-    setValue("Skills", [...selectedSkills, typerSkill]);
+    setSelectedSkills((prev) => [
+      ...prev,
+      { skillName: typerSkill, skillUrl: "" },
+    ]);
+    setValue("Skills", [
+      ...formSkills,
+      { skillName: typerSkill, skillUrl: "" },
+    ]);
     const updatedSkillsVerifications = {
       ...skillsVerification,
       [typerSkill]: {
@@ -179,7 +205,8 @@ const Skills = () => {
     setValue("skillsVerifications", updatedSkillsVerifications);
     setTyperSkill("");
   };
-  console.log("stored skills verifications", storedVerification);
+  console.log("stores skill verifications", storedVerification);
+  console.log("skills are", skills);
   return (
     <div className="space-y-7">
       <div className="flex flex-col gap-2 px-5 sm:px-10 mt-4">
@@ -190,45 +217,49 @@ const Skills = () => {
       </div>
 
       <div className="flex flex-wrap  mt-4 px-2 sm:px-10 gap-5">
-        {skills.map((skill) => (
-          <Button
-            type="button"
-            key={skill}
-            className={`px-2 sm:px-5 py-1 shadow-md bg-white text-black border border-[#FA9110] hover:bg-white hover:text-black text-sm sm:text-md font-semibold${
-              selectedSkills.includes(skill)
-                ? "border-green-500 text-green-600 hover:border-green-500 hover:text-green-600"
-                : "border-[#FA9110]"
-            }`}
-            onClick={() => selectSkillsHandler(skill)}
-          >
-            {selectedSkills.includes(skill) && (
-              <IoMdCheckmark className="text-lg mr-2 mt-1" />
-            )}
-            {/* <IoMdCheckmark className="text-lg mr-2 mt-1" /> */}
-            {skill}
-          </Button>
-        ))}
+        {skills.map((skill) => {
+          const skillExist = formSkills.some((s: any) => s.skillName === skill);
+          return (
+            <Button
+              type="button"
+              key={skill}
+              className={`px-2 sm:px-5 py-1 shadow-md bg-white text-black border border-[#FA9110] hover:bg-white hover:text-black text-sm sm:text-md font-semibold${
+                skillExist
+                  ? "border-green-500 text-green-600 hover:border-green-500 hover:text-green-600"
+                  : "border-[#FA9110]"
+              }`}
+              onClick={() => selectSkillsHandler(skill)}
+            >
+              {skillExist && <IoMdCheckmark className="text-lg mr-2 mt-1" />}
+              {/* <IoMdCheckmark className="text-lg mr-2 mt-1" /> */}
+              {skill}
+            </Button>
+          );
+        })}
       </div>
 
+      {/* FIXME: bug culprit section start----------------- */}
       <div className="flex px-2 sm:px-10">
         <div className="border p-1 rounded-md flex flex-wrap w-full gap-2">
-          {selectedSkills.length > 0 &&
-            selectedSkills.map((skill) => (
-              <Button
-                key={skill}
-                type="button"
-                className="px-2 sm:px-4  bg-[rgb(0,102,102)] hover:bg-[rgb(0,102,102)] flex items-center text-xs sm:text-base"
-              >
-                {skill}
-                <X
+          {formSkills.length > 0 &&
+            formSkills.map(({ skillName }: any) => {
+              return (
+                <Button
+                  key={skillName}
                   type="button"
-                  onClick={() => removeSkillHandler(skill)}
-                  size={20}
-                  strokeWidth={2}
-                  className="ml-2 mt-1"
-                />
-              </Button>
-            ))}
+                  className="px-2 sm:px-4  bg-[rgb(0,102,102)] hover:bg-[rgb(0,102,102)] flex items-center text-xs sm:text-base"
+                >
+                  {skillName}
+                  <X
+                    type="button"
+                    onClick={() => removeSkillHandler(skillName)}
+                    size={20}
+                    strokeWidth={2}
+                    className="ml-2 mt-1"
+                  />
+                </Button>
+              );
+            })}
           {/* <Button className="px-4  bg-[rgb(0,102,102)] hover:bg-[rgb(0,102,102)]   flex items-center text-base">
             test
             <X size={20} strokeWidth={2} className="ml-2 mt-1" />
@@ -267,25 +298,11 @@ const Skills = () => {
                 </FormItem>
               )}
             />
-            {/* <Input
-              value={typerSkill}
-              onChange={(e) => setTyperSkill(e.target.value)}
-              className="border-none outline-none focus-visible:ring-0 focus-visible:ring-transparent flex-1  min-w-48"
-              placeholder={`Add custom skills`}
-              onKeyDown={handleKeyDown}
-            />
-            {typerSkill && (
-              <div
-                className={`border border-zinc-300 absolute top-full left-5 px-5  max-w-xl w-full rounded-md ${
-                  isKeyDown ? "bg-[#F4F4F5]" : "bg-white"
-                } py-2  mt-2 overflow-hidden text-wrap z-10`}
-              >
-                <span className="">{typerSkill}</span>
-              </div>
-            )} */}
           </div>
         </div>
       </div>
+      {/* bug culprit section end ----------------- */}
+
       {/* alert instruction */}
       <div className="px-2 sm:px-10">
         <Alert className="">
@@ -299,22 +316,21 @@ const Skills = () => {
       </div>
       {/* Animated skills section */}
       <div className="flex flex-col gap-4 sm:px-2">
-        {selectedSkills.map((skill, i) => (
+        {formSkills.map((formSkill: any, i: any) => (
           <FormField
-            name={`skillsVerificationsValidations[${skill}]`}
+            name={`skillsVerificationsValidations[${formSkill.skillName}]`}
             control={control}
             render={() => (
               <FormItem className="">
                 <AnimatedVerification
                   key={i}
-                  firstButtonText={skill}
-                  field={skill}
+                  firstButtonText={formSkill.skillName}
+                  field={formSkill.skillName}
                   storedVerifications={storedVerification}
                   verificationObject={skillsVerification}
                   validationStep="skillsVerificationsValidations"
                   setterVerificationObject={setSkillsVerification}
                   verificationStep="skillsVerifications"
-                  skill ={skill}
                 />
                 <FormMessage />
               </FormItem>

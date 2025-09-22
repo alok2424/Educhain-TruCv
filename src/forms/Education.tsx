@@ -15,7 +15,7 @@ import { convertDateToString } from "@/utils";
 import dayjs from "dayjs";
 //import { convertDateToString } from "@/utils";
 //import dayjs from "dayjs";
-import { useEffect, useRef, useState} from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 
 const highestQualification: string[] = [
@@ -40,14 +40,19 @@ const Education = ({
   );
   const { educationVerifications, setEducationVerifications } =
     useCvFromContext();
-  const {class10SchoolName,class12CollegeName,underGraduateCollegeName,
-    postGraduateCollegeName,underGraduateDegreeName,
-    postGraduateDegreeName, educationVerificationValidations: storedVerifications } = getValues();
-  console.log(getValues());
+  const {
+    class10SchoolName,
+    class12CollegeName,
+    underGraduateCollegeName,
+    postGraduateCollegeName,
+    underGraduateDegreeName,
+    postGraduateDegreeName,
+    educationVerificationValidations: storedVerifications,
+  } = getValues();
+  console.log("form values are", getValues());
 
-
-   // Initialize date from localStorage only once
-   const initialDate = useRef(() => {
+  // Initialize date from localStorage only once
+  const initialDate = useRef(() => {
     const storedFormData = localStorage.getItem("step2CvData");
     if (storedFormData) {
       const parsedFormData = JSON.parse(storedFormData);
@@ -61,9 +66,9 @@ const Education = ({
     return { from: null, to: null };
   });
 
-   const initialDate2 = useRef(() => {
+  const initialDate2 = useRef(() => {
     const storedFormData = localStorage.getItem("step2CvData");
-    console.log("stored farm data",storedFormData);
+    // console.log("stored farm data", storedFormData);
     if (storedFormData) {
       const parsedFormData = JSON.parse(storedFormData);
       return (
@@ -76,8 +81,7 @@ const Education = ({
     return { from: null, to: null };
   });
 
-  const {setValue} = useFormContext();
-
+  const { setValue } = useFormContext();
 
   const [date, setDate] = useState(initialDate.current);
   const [date2, setDate2] = useState(initialDate2.current);
@@ -95,7 +99,7 @@ const Education = ({
     if (date2.from && date2.to) {
       setValue(`postGraduateDuration.duration`, date2);
     }
-  }, [date,date2,setValue]);
+  }, [date, date2, setValue]);
 
   // Update date when dateFrom or dateTo changes
   useEffect(() => {
@@ -111,21 +115,27 @@ const Education = ({
         to: convertDateToString(dateTo2),
       });
     }
-  }, [dateFrom, dateTo,dateFrom2, dateTo2]);
+  }, [dateFrom, dateTo, dateFrom2, dateTo2]);
 
+  useEffect(() => {
+    setIsAnswered(
+      localStorage.getItem("qualificationAnswered") === "true" ? true : false
+    );
+  }, [localStorage.getItem("qualificationAnswered")?.length]);
+  console.log("stored verfications are", storedVerifications);
   return (
     <>
       {!isAnswered ? (
         <div className="px-1 md:px-10 mt-5 space-y-5">
           <h1 className="text-xl font-semibold">
-            What is your highest qualification?
+            What is your highest qualification?*
           </h1>
           <div className="flex flex-wrap gap-5">
             {highestQualification.map((qualification) => (
               <Button
                 type="button"
                 key={qualification}
-                className={`px-5 py-1 flex-1 md:flex-none shadow-md bg-white text-black border border-[#FA9110] hover:bg-white hover:text-black text-md font-semibold`}
+                className={`px-5 py-1 flex-1 md:flex-none shadow-md bg-white text-black border border-[#FA9110] hover:bg-white hover:text-black text-md font-semibold capitalize`}
                 onClick={() => {
                   setIsAnswered(true);
                   localStorage.setItem("qualificationAnswered", "true");
@@ -150,12 +160,9 @@ const Education = ({
               control={control}
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Class 10th school name</FormLabel>
+                  <FormLabel>Class 10th school name*</FormLabel>
                   <FormControl>
-                    <Input 
-                    placeholder="Enter 10th school name" {...field}
-                    
-                    />
+                    <Input placeholder="Enter 10th school name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -166,9 +173,19 @@ const Education = ({
               control={control}
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>10th Board (Ex:CBSE,ICSE,regional)</FormLabel>
+                  <FormLabel>10th Board (Ex:CBSE,ICSE,regional)*</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter 10th Board" {...field} />
+                    <Input
+                      type="text"
+                      placeholder="Enter 10th Board"
+                      {...field}
+                      onKeyDown={(e) => {
+                        // Block numbers
+                        if (/[0-9]/.test(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -179,7 +196,7 @@ const Education = ({
               control={control}
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Class 10th Grade</FormLabel>
+                  <FormLabel>Class 10th Grade*</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -232,7 +249,7 @@ const Education = ({
                   control={control}
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Class 12th college name</FormLabel>
+                      <FormLabel>Class 12th college name*</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Enter 12th college name"
@@ -249,10 +266,19 @@ const Education = ({
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel className="text-nowrap">
-                        12th Board (Ex:CBSE,ICSE,regional)
+                        12th Board (Ex:CBSE,ICSE,regional)*
                       </FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter 12 th Board" {...field} />
+                        <Input
+                          placeholder="Enter 12 th Board"
+                          {...field}
+                          onKeyDown={(e) => {
+                            // Block numbers
+                            if (/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -263,7 +289,7 @@ const Education = ({
                   control={control}
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Class 12th Grade</FormLabel>
+                      <FormLabel>Class 12th Grade*</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -316,7 +342,7 @@ const Education = ({
                   control={control}
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Undergraduation College name</FormLabel>
+                      <FormLabel>Undergraduation College name*</FormLabel>
                       <FormControl>
                         <Input placeholder="Enter college name" {...field} />
                       </FormControl>
@@ -329,9 +355,18 @@ const Education = ({
                   control={control}
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Degree (Ex:B-tech)</FormLabel>
+                      <FormLabel>Degree (Ex:B-tech)*</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter degree" {...field} />
+                        <Input
+                          placeholder="Enter degree"
+                          {...field}
+                          onKeyDown={(e) => {
+                            // Block numbers
+                            if (/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -342,7 +377,7 @@ const Education = ({
                   control={control}
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>CGPA</FormLabel>
+                      <FormLabel>CGPA*</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -356,38 +391,37 @@ const Education = ({
                 />
               </div>
 
-    <div className="flex justify-center gap-2 items-center py-2">
-  
-        <FormField
-          name={`underGraduateDuration.duration`}
-          control={control}
-          render={() => (
-            <FormItem className="flex  gap-1 flex-col justify-center mt-2">
-              <FormLabel className="">Graduation Duration</FormLabel>
-              <FormControl>
-                <div className="flex gap-10">
-                  <div className="">
-                    <p className="text-base">From</p>
-                    <UnderGraduateCal
-                      value={dateFrom}
-                      setValue={setDateFrom}
-                      isDateFrom
-                    />
-                  </div>
-                  <div>
-                    <p className="text-base">To</p>
-                    <UnderGraduateCal
-                      value={dateTo}
-                      setValue={setDateTo}
-                    />
-                  </div>
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div> 
+              <div className="flex justify-center gap-2 items-center py-2">
+                <FormField
+                  name={`underGraduateDuration.duration`}
+                  control={control}
+                  render={() => (
+                    <FormItem className="flex  gap-1 flex-col justify-center mt-2">
+                      <FormLabel className="">Graduation Duration*</FormLabel>
+                      <FormControl>
+                        <div className="flex gap-10">
+                          <div className="">
+                            <p className="text-base">From</p>
+                            <UnderGraduateCal
+                              value={dateFrom}
+                              setValue={setDateFrom}
+                              isDateFrom
+                            />
+                          </div>
+                          <div>
+                            <p className="text-base">To</p>
+                            <UnderGraduateCal
+                              value={dateTo}
+                              setValue={setDateTo}
+                            />
+                          </div>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               {/* Animated skills section */}
               <div className="flex flex-col gap-4 sm:px-10">
                 {/* for tablets and desktops */}
@@ -460,7 +494,7 @@ const Education = ({
                   control={control}
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Postgraduation College name</FormLabel>
+                      <FormLabel>Postgraduation College name*</FormLabel>
                       <FormControl>
                         <Input placeholder="Enter college name" {...field} />
                       </FormControl>
@@ -473,9 +507,18 @@ const Education = ({
                   control={control}
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Degree</FormLabel>
+                      <FormLabel>Degree*</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter degree" {...field} />
+                        <Input
+                          placeholder="Enter degree"
+                          {...field}
+                          onKeyDown={(e) => {
+                            // Block numbers
+                            if (/[0-9]/.test(e.key)) {
+                              e.preventDefault();
+                            }
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -486,7 +529,7 @@ const Education = ({
                   control={control}
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>CGPA</FormLabel>
+                      <FormLabel>CGPA*</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -500,37 +543,38 @@ const Education = ({
                 />
               </div>
               <div className="flex justify-center gap-2 items-center py-2">
-  
-        <FormField
-          name={`postGraduateDuration.duration`}
-          control={control}
-          render={() => (
-            <FormItem className="flex  gap-1 flex-col justify-center mt-2">
-              <FormLabel className="">Post Graduation Duration</FormLabel>
-              <FormControl>
-                <div className="flex gap-10">
-                  <div className="">
-                    <p className="text-base">From</p>
-                    <PostGraduateCal
-                      value={dateFrom2}
-                      setValue={setDateFrom2}
-                      isDateFrom
-                    />
-                  </div>
-                  <div>
-                    <p className="text-base">To</p>
-                     <PostGraduateCal
-                      value={dateTo2}
-                      setValue={setDateTo2}
-                    />
-                  </div>
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+                <FormField
+                  name={`postGraduateDuration.duration`}
+                  control={control}
+                  render={() => (
+                    <FormItem className="flex  gap-1 flex-col justify-center mt-2">
+                      <FormLabel className="">
+                        Post Graduation Duration*
+                      </FormLabel>
+                      <FormControl>
+                        <div className="flex gap-10">
+                          <div className="">
+                            <p className="text-base">From</p>
+                            <PostGraduateCal
+                              value={dateFrom2}
+                              setValue={setDateFrom2}
+                              isDateFrom
+                            />
+                          </div>
+                          <div>
+                            <p className="text-base">To</p>
+                            <PostGraduateCal
+                              value={dateTo2}
+                              setValue={setDateTo2}
+                            />
+                          </div>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               {/* Animated skills section */}
               <div className="flex flex-col gap-4 sm:px-10">
                 {/* for tablets and desktops */}

@@ -75,4 +75,3 @@ export const foreignLogos = [foreignLogo1,foreignLogo2,foreignLogo3,foreignLogo4
 export const accLogos = [accLogo1,accLogo2,accLogo3,accLogo4,accLogo5,accLogo6,accLogo7,accLogo8,accLogo9];
 export const mediaLogos = [mediaLogo1,mediaLogo2,mediaLogo3,mediaLogo4,mediaLogo5,mediaLogo6];
 
-

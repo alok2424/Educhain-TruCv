@@ -1,19 +1,10 @@
-// import packages
-import { useEffect } from "react";
-import { useNavigate, Outlet } from "react-router-dom";
 
-const ProtectedRoute = () => {
-  const navigate = useNavigate();
+import { Navigate } from "react-router-dom";
+
+
+const ProtectedRoute = ({children}:{children:React.ReactNode}) => {
   const user = localStorage.getItem("googleIdToken");
-
-  useEffect(() => {
-    if (!user) {
-      return navigate("/", { replace: true });
-    }
-  }, [user, navigate]);
-
-  return (
-      <Outlet />
+  return (user?<>{children}</>:<Navigate to="/login"/>
   );
 };
 

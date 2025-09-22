@@ -2,12 +2,11 @@ import React, {useState,useEffect} from "react";
 import logo from "../assets/newLogo.png";
 import truCv from "../assets/truCV2.png";
 import { Link } from "react-router-dom";
-import { useNavigate,useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import {
   MdClose,
 } from "react-icons/md";
 import toast from "react-hot-toast";
-import { googleLogout } from "@react-oauth/google";
 
 
 
@@ -48,12 +47,12 @@ interface SidebarProps {
 
 
 
-const Navbar:React.FC = () => {
+const Navbar:React.FC<{handlerLogout:()=>void}> = ({handlerLogout}) => {
   const [isActive, setActive] = useState("/");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   // const [auth, setAuth] = useState<string>();
-  // const [address, setAddress] = useState<string>();
-  const navigate = useNavigate();
+  
+  //const oktoClient = useOkto();
   const location = useLocation();
   const currentPath = location.pathname;
 console.log("currentPath",currentPath);
@@ -64,37 +63,95 @@ console.log("currentPath",currentPath);
     setIsSidebarOpen((prevState) => !prevState);
   };
 
- 
-  // const copyAddress = async () => {
+  // const fetchUserPortfolio = async () => {
   //   try {
-  //     if (address) await navigator.clipboard.writeText(address);
-  //     toast.success("address copied");
+  //     const accounts= await getAccount(oktoClient);
+  //     console.log("accounts",accounts)
+  //     if(accounts?.length>0)
+  //     {
+  //       console.log("accounts",accounts)
+  //       const acc= accounts.find((accs)=>accs.networkName==="POLYGON");
+  //       setAddress(acc?.address);
+  //       setNetworkName(acc?.networkName);
+  //       setOpenWalletInfo(true);
+  //     }
+      
   //   } catch (error) {
-  //     toast.error("Please refresh the page and try again..");
+  //     toast.error("something went wrong...");
+  //     console.log("error while fetching user details...", error);
   //   }
   // };
 
 
-  const handlerLogout = () => {
-    try {
-            googleLogout();    // Perform Google OAuth logout and remove stored token  
-            localStorage.removeItem("googleIdToken");
-            localStorage.removeItem("email");
-            localStorage.removeItem("userName");
-            localStorage.removeItem("userImage");
-            localStorage.removeItem("tokenExpiry");
-            navigate("/");
-            return { result: "Logout success" };
-        } catch (error) {
-            console.error("Logout failed:", error);
-            return { result: "Logout failed" };
-        }
-  };
+  //    useEffect(() => {
+  //   if (oktoClient.isLoggedIn() && !currentPath.includes("/new-cv")) {
+  //     console.log("logged in");
+  //     navigate("/");
+  //     return;
+  //   }
+
+  //   // If not authenticated with Okto, check for stored Google token
+  //   const storedToken = localStorage.getItem("googleIdToken");
+  //   if (storedToken) {
+  //     console.log("storedToken", storedToken);
+  //     handleAuthenticate(storedToken);
+  //   }
+    
+  // }, [loginModel]);
+
+
+  //const handleAuthenticate = async (idToken: string) => {
+  //   try {
+  //     const user = await oktoClient.loginUsingOAuth({
+  //       idToken: idToken,
+  //       provider: "google",
+  //     } , (session: any) => {
+  //       // Store the session info securely
+  //       console.log("session", session);
+  //       localStorage.setItem("okto_session", JSON.stringify(session));
+  //     });
+  //     console.log("Authenticated with Okto:", user);
+  //     const userData:UserLoginData = jwtDecode(idToken);
+  //     console.log("userData",userData);
+  //     localStorage.setItem("email",userData.email);
+  //     localStorage.setItem("userName",userData.name);
+  //     localStorage.setItem("userImage",userData.picture);
+  //     //console.log("userData",userData);
+  //     setLoginModel(false);
+  //     setLoading(false);
+  //     //navigate("/");
+  //   } catch (error) {
+  //     console.error("Authentication failed:", error);
+  //     setLoading(false);
+
+  //     // Remove invalid token from storage
+  //     localStorage.removeItem("googleIdToken");
+  //   }
+  // };
+
+  // Handles successful Google login
+  // 1. Stores the ID token in localStorage
+  // 2. Initiates Okto authentication
+
+
+  // const handleGoogleLogin = async (credentialResponse: any) => {
+  //   setLoading(true);
+  //   const idToken = credentialResponse.credential || "";
+  //   console.log("idtoken",idToken);
+  //   if (idToken) {
+  //     localStorage.setItem("googleIdToken", idToken);
+  //     handleAuthenticate(idToken);
+  //   }
+  // };
+
+
 
   const handlerActive = (linkName: string): void => {
     setActive(linkName);
   };
-
+  // const hidePopup = () => {
+  //   setLoginModel(false);
+  // };
   const links = [
     {
       name: "Home",
@@ -107,10 +164,22 @@ console.log("currentPath",currentPath);
     {
       name: "Dashboard",
       path: "/dashboard",
+    },
+    {
+      name:"Admin",
+      path:"/admin"
     }
   ];
 
 
+  // useEffect(() => {
+  //   const hasSeenPopup = localStorage.getItem('hasSeenPopup');
+  //   if (!hasSeenPopup) {
+  //     setShowText(true);
+  //     localStorage.setItem('hasSeenPopup', 'true');
+  //   }
+    
+  // }, []);
 
   useEffect(()=>{
     const tokenExpiry = localStorage.getItem("tokenExpiry");
@@ -205,7 +274,6 @@ console.log("currentPath",currentPath);
             ></span>
           </div>
         </div>
-
       </div>
       {/* Sidebar */}
       <Sidebar

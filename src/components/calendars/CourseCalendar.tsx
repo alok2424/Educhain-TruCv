@@ -1,5 +1,5 @@
 import * as React from "react";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+//import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -37,15 +37,14 @@ export default function CourseCalendar({
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <DemoContainer components={["DatePicker"]}>
-        <DatePicker
-          value={value}
-          onChange={setValue}
-          defaultValue={initialDefaultDate}
-          views={["year", "month", "day"]}
-          className="w-full"
-        />
-      </DemoContainer>
+      <DatePicker
+        value={value}
+        onChange={setValue}
+        maxDate={dayjs()}
+        defaultValue={initialDefaultDate}
+        views={["year", "month", "day"]}
+        className="w-[130px] sm:w-full"
+      />
     </LocalizationProvider>
   );
 }

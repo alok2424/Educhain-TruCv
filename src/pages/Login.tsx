@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
-import {Link} from "react-router-dom"
+import { Link } from "react-router-dom";
 interface UserLoginData {
     name: string;
     email: string;
@@ -10,20 +10,24 @@ interface UserLoginData {
 }
 const GoogleLoginModal = ()=>{
     const [loading,setLoading] = useState(false);
+    const hidePopup = ()=>{
+        setLoading(false);
+    }
     const handleGoogleLogin = (credentialResponse: any) => {
         setLoading(true);
             const userData:UserLoginData = jwtDecode(credentialResponse.credential);
-            localStorage.setItem('userName', userData.name);
-            localStorage.setItem('userMailId', userData.email);
-            localStorage.setItem('userImage', userData.picture);
+            localStorage.setItem('userProfileName', userData?.name);
+            localStorage.setItem('email', userData?.email);
+            localStorage.setItem('userImage', userData?.picture);
             localStorage.setItem('googleIdToken', credentialResponse.credential);
-            localStorage.setItem('tokenExpiry', userData.exp.toString());
+            localStorage.setItem('tokenExpiry', userData?.exp.toString());
             window.location.href = '/';
       };
     
     return(
         <div
   className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300"
+  onClick={hidePopup}
   aria-modal="true"
   role="dialog"
 >

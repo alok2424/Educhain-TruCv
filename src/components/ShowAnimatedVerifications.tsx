@@ -47,8 +47,8 @@ export function ShowAnimatedVerifications({
   firstButtonText: string;
   buttonClass?: string;
   isSelfAttested: boolean;
-  mailStatus:string;
-  hash:[];
+  mailStatus?:string;
+  hash?:string[];
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   // const div1Ref = useRef<HTMLDivElement>(null);
@@ -84,9 +84,9 @@ export function ShowAnimatedVerifications({
             </div> */}
             <div
               ref={div7Ref}
-              className="px-2 py-1 text-xs lg:text-sm tracking-wide font-semibold rounded-sm bg-[#006666] text-white w-fit"
+              className="flex justify-center items-center gap-2 px-2 py-1 text-xs lg:text-sm tracking-wide font-semibold rounded-sm bg-[#006666] text-white w-fit"
             >
-              {firstButtonText}
+              {firstButtonText }
             </div>
           </div>
         </div>
@@ -108,7 +108,7 @@ export function ShowAnimatedVerifications({
           <div ref={div2Ref} className="z-50 bg-white  w-96">
             <ShowVerifications isAttested={isSelfAttested} mailStatus={mailStatus} hash={hash}/>
           </div>
-        </div>
+        </div>  
       </div>
 
       {/* AnimatedBeams */}
@@ -150,6 +150,6 @@ export function ShowAnimatedVerifications({
         toRef={div7Ref}
         duration={3}
       />
-    </div>
+    </div> 
   );
 }

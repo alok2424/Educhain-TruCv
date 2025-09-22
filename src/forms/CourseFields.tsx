@@ -107,7 +107,7 @@ const CourseFields = ({ index, removeCourseFields, fields }: Props) => {
           control={control}
           render={({ field }) => (
             <FormItem className="flex-1">
-              <FormLabel>Course name</FormLabel>
+              <FormLabel>Course name*</FormLabel>
               <FormControl>
                 <Input {...field} placeholder="Enter course name" />
               </FormControl>
@@ -120,7 +120,7 @@ const CourseFields = ({ index, removeCourseFields, fields }: Props) => {
           control={control}
           render={({ field }) => (
             <FormItem className="flex-1">
-              <FormLabel>Institution/Organization</FormLabel>
+              <FormLabel>Institution/Organization*</FormLabel>
               <FormControl>
                 <Input
                   {...field}
@@ -132,38 +132,38 @@ const CourseFields = ({ index, removeCourseFields, fields }: Props) => {
           )}
         />
         {/* duration */}
-        <FormField
-          name={`Courses.${index}.duration`}
-          control={control}
-          render={() => (
-            <FormItem className="flex flex-1 gap-1 flex-col justify-center">
-              <FormLabel className="">Duration</FormLabel>
-              <FormControl>
-                <div className="flex gap-10">
-                  <div className="">
-                    <p className="text-base">From</p>
-                    <CourseCalendar
-                      value={dateFrom}
-                      setValue={setDateFrom}
-                      index={index}
-                      isDateFrom
-                    />
-                  </div>
-                  <div>
-                    <p className="text-base">To</p>
-                    <CourseCalendar
-                      value={dateTo}
-                      setValue={setDateTo}
-                      index={index}
-                    />
-                  </div>
-                </div>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
       </div>
+      <FormField
+        name={`Courses.${index}.duration`}
+        control={control}
+        render={() => (
+          <FormItem className="flex flex-1 gap-1 flex-col justify-center mt-10">
+            <FormLabel className="mt-5">Duration*</FormLabel>
+            <FormControl>
+              <div className="flex flex-col md:flex-row items-center gap-10">
+                <div className="">
+                  <p className="text-base">From</p>
+                  <CourseCalendar
+                    value={dateFrom}
+                    setValue={setDateFrom}
+                    index={index}
+                    isDateFrom
+                  />
+                </div>
+                <div>
+                  <p className="text-base">To</p>
+                  <CourseCalendar
+                    value={dateTo}
+                    setValue={setDateTo}
+                    index={index}
+                  />
+                </div>
+              </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
       {/* work description */}
       <div className="flex flex-col lg:flex-row lg:items-center gap-2 lg:gap-5">
         <FormField
@@ -171,7 +171,7 @@ const CourseFields = ({ index, removeCourseFields, fields }: Props) => {
           control={control}
           render={({ field }) => (
             <FormItem className="flex-1">
-              <FormLabel>Course description</FormLabel>
+              <FormLabel>Course description*</FormLabel>
               <FormDescription className="text-sm">
                 You can share a short description of the course content and what
                 was learned.
@@ -183,7 +183,7 @@ const CourseFields = ({ index, removeCourseFields, fields }: Props) => {
             </FormItem>
           )}
         />
-        {fields.length > 1 && index + 1 === fields.length && (
+        {/* {fields.length > 1 && index + 1 === fields.length && (
           <Button
             type="button"
             variant={"destructive"}
@@ -193,7 +193,16 @@ const CourseFields = ({ index, removeCourseFields, fields }: Props) => {
             Remove
             <MdDeleteOutline className="text-xl ml-2" />
           </Button>
-        )}
+        )} */}
+        <Button
+          type="button"
+          variant={"destructive"}
+          className="mt-5 text-sm px-10"
+          onClick={deleteHandler}
+        >
+          Remove
+          <MdDeleteOutline className="text-xl ml-2" />
+        </Button>
       </div>
       {/* Animated Verification section */}
       <div className="flex flex-col gap-4 sm:px-2">

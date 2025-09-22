@@ -38,11 +38,14 @@ const NFTGallery: React.FC<NFTGalleryProps> = ({ contractAddress, abi,account })
       const tokenIds = (await contract.getTokenIds(account)).map((id: ethers.BigNumber) =>
         id.toString()
       );
+      console.log("tokenIds",tokenIds);
       // Fetch metadata for each token ID
       const nftPromises = tokenIds.map(async (tokenId: string) => {
         const tokenUri: string = await contract.tokenURI(tokenId);
-        const metadataUrl = `https://gateway.pinata.cloud/ipfs/${tokenUri}`;
-        const response = await fetch(metadataUrl);
+        console.log("tokenUri",tokenUri);
+        const metadataUrl = `${import.meta.env.VITE_AzureGATWAY}/${tokenUri}`;
+        console.log("metadataUrl",metadataUrl);
+        const response:any = await fetch(metadataUrl);
         const metadata = await response.json();
 
         return {
@@ -103,7 +106,7 @@ const NFTGallery: React.FC<NFTGalleryProps> = ({ contractAddress, abi,account })
                   {nft?.hash && (
                     <a
                       className="inline-block mt-4 text-sm text-white bg-[#ff7300] px-4 py-2 rounded-full hover:bg-[#006666] transition-all"
-                      href={`https://${import.meta.env.VITE_PINATAGATWAY}/ipfs/${nft.hash}`}
+                      href={`${import.meta.env.VITE_AzureGATWAY}/${nft.hash}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >

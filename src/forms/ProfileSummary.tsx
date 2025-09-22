@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { useCvFromContext } from "@/context/CvForm.context";
+import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 // type ProfileSummaryVerificationType = {
 //   profile_summary: {
@@ -19,6 +20,13 @@ const ProfileSummary = () => {
   const { profileSummaryVerification, setProfileSummaryVerification } =
     useCvFromContext();
   console.log(profileSummaryVerification);
+  useEffect(() => {
+    setProfileSummaryVerification({
+      profile_summary: {
+        isSelfAttested: false,
+      },
+    });
+  }, []);
   const handleSelfAttest = () => {
     setProfileSummaryVerification({
       profile_summary: {
@@ -36,7 +44,7 @@ const ProfileSummary = () => {
   return (
     <div className="flex flex-col gap-5 px-6 sm:px-10 mt-5">
       <div>
-        <h1 className="text-2xl font-semibold">Profile Summary</h1>
+        <h1 className="text-2xl font-semibold">Profile Summary*</h1>
         <FormDescription className="text-sm">
           Provide a brief overview of professional background, key skills, and
           accomplishments. Highlight expertise, experience, and unique strengths
@@ -65,6 +73,7 @@ const ProfileSummary = () => {
             <SelfAttestButton
               className="lg:ml-5"
               onClick={handleSelfAttest}
+              required={true}
               isAttested={
                 profileSummaryVerification.profile_summary.isSelfAttested
               }

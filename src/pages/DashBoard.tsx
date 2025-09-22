@@ -1,14 +1,14 @@
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 //import OnChainData from "./OnChainData";
 import CvById from "./CvById";
 import { connectWallet } from "@/api/contract.api";
 import toast from "react-hot-toast";
-import { useCvFromContext } from "@/context/CvForm.context";
-import { API_BASE_URL } from "@/main";
+//import { API_BASE_URL } from "@/main";
 import { contractNFTAddress,abiNFT } from "@/contract/nft.contractData";
 import NFTGallery from "./NFTData";
-
+import { API_BASE_URL } from "@/main";
+import { useCvFromContext } from "@/context/CvForm.context";
 const DashBoard = () => {
     const [isActiveButton , setActiveButton] = useState<boolean>(true);
     const {account,setAccount} = useCvFromContext();
@@ -34,8 +34,10 @@ const DashBoard = () => {
     //  }
 
      const getAccount = async()=>{
+  
       try
       {
+        console.log("clicked")
         const acc = await connectWallet();
         if(acc)
         setAccount(acc);
@@ -54,20 +56,26 @@ const DashBoard = () => {
      const fetchIds = async()=>{
       const id=toast.loading("document fetching...")
       try{
-        const loginMailId=localStorage.getItem("userMailId");
+        const loginMailId= localStorage.getItem("email");
         const response = await fetch(`${API_BASE_URL}/cv/getCvIds/${loginMailId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            "Authorization":`Bearer ${localStorage.getItem("googleIdToken")}`
           },
         });
         const data = await response.json();
+        console.log("ids response",data);
         if(!data.success)
         {
           toast.dismiss(id);
-          return toast.error("No CV found");
+          if(data.message==="Invalid token")
+          {
+            window.location.href="/invalid-token"
+          }
+          return toast.error(data.message ||"No CV found")
         }
-        setCvData(data?.Ids);
+        setCvData(data?.userData.nanoIds);
         toast.dismiss(id);
         //console.log("ids response",data?.Ids);
         //if(response)
@@ -79,11 +87,17 @@ const DashBoard = () => {
       }
      }
 
+
+     useEffect(()=>{
+      fetchIds();
+     },[])
+
      const idFetchHandler = ()=>{
       setActiveButton(true)
       setNFT(false);
       fetchIds();
      }
+
      const nftFetchHandler = ()=>{
       setActiveButton(false)
       setNFT(true);
@@ -117,7 +131,6 @@ const DashBoard = () => {
           }
         </div>
     </div>
-
   )
 }
 

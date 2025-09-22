@@ -1,16 +1,52 @@
 import { useGetCv } from "@/api/cv.apis";
 import { useParams } from "react-router-dom";
 import { SiHyperskill } from "react-icons/si";
-import { FaBriefcase } from "react-icons/fa";
+import { FaBriefcase, FaCopy} from "react-icons/fa";
 import { GiAchievement } from "react-icons/gi";
 import { BiSolidBriefcase } from "react-icons/bi";
-import { GraduationCap, Mail, MapPinned, Phone} from "lucide-react";
+import { GraduationCap, Mail, MapPinned, Phone } from "lucide-react";
 import { MdSchool } from "react-icons/md";
+// import HyperText from "@/components/ui/AnimateHypertext";
 import ShowVerifications from "@/components/ShowVerifications";
 import { ShowAnimatedVerifications } from "@/components/ShowAnimatedVerifications";
+import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useState, useRef } from "react";
 import ThreeDotLoader from "@/components/Loader/ThreeDotLoader";
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+
+  // Check if year is 1970, return "Present"
+  if (date.getFullYear() === 1970) {
+    return "Present";
+  }
+
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const month = months[date.getMonth()];
+  const day = date.getDate().toString().padStart(2, "0");
+  const year = date.getFullYear();
+
+  return `${month} ${day} ${year}`;
+};
 const CvOutputPage = () => {
   const { id } = useParams();
+  const [copied, setCopied] = useState<boolean>(false);
+
+  const pdfRef = useRef<HTMLDivElement>(null);
 
   if (!id) {
     return;
@@ -19,51 +55,62 @@ const CvOutputPage = () => {
   const { cvData, isLoading } = useGetCv(id);
   console.log(cvData);
   if (isLoading) {
-    return(
-    <div className="flex justify-center items-center">
-      <ThreeDotLoader w={2} h={2} yPos={'end'} />
-    </div>
+    return (
+      <div className="flex justify-center items-center">
+        <ThreeDotLoader w={4} h={4} yPos={"center"} />
+      </div>
     );
   }
 
   if (!cvData) {
-    return(
+    return (
       <div className="flex justify-center items-center">
-        <h1 className="text-4xl font-bold text-[#03257e]">No CV Found</h1>
+        <h1 className="text-4xl font-bold text-[#006666]">No CV Found</h1>
       </div>
-      );
+    );
   }
+
+  const copyResumeLink = async (link: string) => {
+    await navigator.clipboard
+      .writeText(link)
+      .then(() => setCopied(true))
+      .catch((err) => {
+        toast.error("something went wrong", err.message);
+      });
+    //console.log("Link copied to clipboard");
+  };
+
   return (
     <div className="px-1 mt-5 md:mt-0 md:px-10 mb-10 overflow-hidden">
-      {/* <div className="border flex">
-        <div className="mx-auto">
-          <HyperText
-            text="POWERED BY EDUBUK"
-            className="text-xl md:text-4xl self-center  font-semibold text-[#006666]"
-          />
+      <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-6 px-4 py-4">
+        <h1 className="text-xl md:text-2xl text-center font-bold text-[#006666]">
+          Verified Curriculum Vitae (CV) on the Blockchain
+        </h1>
+
+        <Link
+          to={`/new-cv/${id}`}
+          className="px-4 py-2 border-2 border-[#f14419] text-[#f14419] font-semibold rounded-lg hover:bg-[#f14419] hover:text-white transition duration-200"
+        >
+          View Other Template
+        </Link>
+
+        <div
+          className="flex items-center gap-2 cursor-pointer text-[#03257e] hover:text-[#006666]"
+          onClick={() => copyResumeLink(`https://educhain-tru-cv.vercel.app/cv/${id}`)}
+        >
+          <FaCopy />
+          <span className="font-medium">
+            {copied ? "Copied" : "Copy CV Link"}
+          </span>
         </div>
-      </div> */}
-      {/* <div className="flex items-center justify-center  px-10 py-2">
-        <img
-          src="/edubuklogo.png"
-          alt="logo"
-          className="md:h-16 md:w-16 h-10 w-10 object-cover"
-          draggable={false}
-        />
-        <div className="ml-5">
-          <HyperText
-            text="POWERED BY EDUBUK"
-            className="text-xl md:text-4xl font-semibold text-[#006666]"
-          />
-        </div>
-      </div> */}
-       <div className="flex justify-center items-center gap-4">
-      <h1 className="text-md md:text-2xl text-center font-semibold text-[#006666]">
-        Verified Curriculum Vitae (CV) on the Blockchain
-      </h1>
-      <a className="border border-gray-500 p-2 rounded-lg hover:text-[#006666]" href={`https://educhain-tru-cv.vercel.app/new-cv/${id}`} target="_blank">View Other Template</a>
       </div>
-      <div className="mt-2 max-w-6xl mx-auto w-full border  border-l-0 shadow-lg   rounded-md overflow-x-scroll xl:overflow-x-clip">
+      <div className="w-full text-center text-[#F1441C] text-lg mt-2 lg:hidden">
+        👉 Swipe left/right to view the full CV
+      </div>
+      <div
+        ref={pdfRef}
+        className=" mt-2 max-w-6xl mx-auto w-full border  border-l-0 shadow-lg   rounded-md overflow-x-scroll xl:overflow-x-clip"
+      >
         {/* main */}
         <div className="flex gap-3 md:gap-7">
           {/* left sidebar */}
@@ -88,7 +135,7 @@ const CvOutputPage = () => {
             </div>
 
             {/* Education */}
-            <div >
+            <div>
               <div className="flex items-center gap-3 px-1">
                 <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center">
                   <GraduationCap size={20} />
@@ -106,31 +153,32 @@ const CvOutputPage = () => {
                   cvData.education.postGraduateGPA && (
                     <div className="flex flex-col">
                       <h1 className="font-semibold text-sm md:text-base">
-                        {cvData.education.postGraduateCollege}
+                        {cvData.education.postGraduateCollege}{" "}
                       </h1>
                       <ShowVerifications
                         isAttested={
                           cvData.educationVerifications.postgraduation
                             .isSelfAttested || false
                         }
-                        mailStatus={cvData.educationVerifications.postgraduation.mailStatus}
-                        hash={cvData.educationVerifications.postgraduation.proof}
+                        mailStatus={
+                          cvData.educationVerifications.postgraduation
+                            .mailStatus
+                        }
+                        hash={cvData?.educationVerifications?.postgraduation?.proof}
                         className="my-2"
                         textClass="text-white"
                         fillCheck
                         fillcheckClass="mt-1"
                         linkClass="text-[#FB980E] font-semibold text-md mt-2"
                       />
-                      <div className="flex flex-col justify-end text-wrap">
-                        <p className="font-normal text-sm">
-                        <strong>Degree: </strong> <i>({cvData.education.postGraduateDegree})</i>
-                        </p>
-                        <p>
-                        <strong>GPA:</strong> <i>{JSON.stringify(cvData.education.postGraduateGPA)}</i>
-                        </p>
-                        <p className="font-normal text-sm">
-                          <i>{cvData.education.postGraduateDuration?.duration.from}</i> - <i>{cvData.education.postGraduateDuration?.duration.to}</i>
-                        </p>
+                      <div className="flex justify-end text-nowrap">
+                        <span className="font-normal text-sm">
+                          - Degree ({cvData.education.postGraduateDegree})
+                        </span>
+                        <span className="font-normal text-sm">
+                          , GPA{" "}
+                          {JSON.stringify(cvData.education.postGraduateGPA)}
+                        </span>
                       </div>
                     </div>
                   )}
@@ -140,31 +188,32 @@ const CvOutputPage = () => {
                   cvData.education.underGraduateGPA && (
                     <div className="flex flex-col">
                       <h1 className="font-semibold text-sm md:text-base">
-                        {cvData.education.underGraduateCollege}
+                        {cvData.education.underGraduateCollege}{" "}
                       </h1>
                       <ShowVerifications
                         isAttested={
                           cvData.educationVerifications.undergraduation
                             .isSelfAttested || false
                         }
-                        mailStatus={cvData.educationVerifications.undergraduation.mailStatus}
-                        hash={cvData.educationVerifications.undergraduation.proof}
+                        mailStatus={
+                          cvData.educationVerifications.undergraduation
+                            .mailStatus
+                        }
+                        hash={cvData?.educationVerifications?.undergraduation?.proof}
                         className="my-2"
                         textClass="text-white"
                         fillCheck
                         fillcheckClass="mt-2"
                         linkClass="text-[#FB980E] font-semibold text-md mt-2"
                       />
-                      <div className="flex flex-col justify-end text-wrap">
-                        <p className="font-normal text-sm">
-                        <strong>Degree: </strong> <i>({cvData.education.underGraduateDegree})</i>
-                        </p>
-                        <p>
-                        <strong>GPA:</strong> <i>{JSON.stringify(cvData.education.underGraduateGPA)}</i>
-                        </p>
-                        <p className="font-normal text-sm">
-                          <i>{cvData.education.underGraduateDuration?.duration.from}</i> - <i>{cvData.education.underGraduateDuration?.duration.to}</i>
-                        </p>
+                      <div className="flex justify-end text-nowrap">
+                        <span className="font-normal text-sm">
+                          - Degree ({cvData.education.underGraduateDegree})
+                        </span>
+                        <span className="font-normal text-sm">
+                          , GPA{" "}
+                          {JSON.stringify(cvData.education.underGraduateGPA)}
+                        </span>
                       </div>
                     </div>
                   )}
@@ -174,15 +223,17 @@ const CvOutputPage = () => {
                   cvData.education.class12Grade && (
                     <div className="flex flex-col">
                       <h1 className="font-semibold text-sm md:text-base">
-                        {cvData.education.class12College}
+                        {cvData.education.class12College}{" "}
                       </h1>
                       <ShowVerifications
                         isAttested={
                           cvData.educationVerifications.class12
                             .isSelfAttested || false
                         }
-                        mailStatus={cvData.educationVerifications.class12.mailStatus}
-                        hash={cvData.educationVerifications.class12.proof}
+                        mailStatus={
+                          cvData.educationVerifications.class12.mailStatus
+                        }
+                        hash={cvData?.educationVerifications?.class12?.proof}
                         className="my-2"
                         textClass="text-white"
                         fillCheck
@@ -206,15 +257,17 @@ const CvOutputPage = () => {
                   cvData.education.class10Grade && (
                     <div className="flex flex-col">
                       <h1 className="font-semibold text-sm md:text-base">
-                        {cvData.education.class10School}
+                        {cvData.education.class10School}{" "}
                       </h1>
                       <ShowVerifications
                         isAttested={
                           cvData.educationVerifications.class10
                             .isSelfAttested || false
                         }
-                        mailStatus={cvData.educationVerifications.class10.mailStatus}
-                        hash={cvData.educationVerifications.class10.proof}
+                        mailStatus={
+                          cvData.educationVerifications.class10.mailStatus
+                        }
+                        hash={cvData?.educationVerifications?.class10?.proof}
                         className="my-2"
                         textClass="text-white"
                         fillCheck
@@ -368,10 +421,11 @@ const CvOutputPage = () => {
                   {cvData.profile_summary}
                 </p>
                 <ShowVerifications
-                  isAttested={
-                    cvData.profileSummaryVerification.profile_summary
-                      .isSelfAttested
-                  }
+                  // isAttested={
+                  //   cvData.profileSummaryVerification.profile_summary
+                  //     .isSelfAttested
+                  // }
+                  isAttested={true}
                   className="self-start mt-2"
                   onlySelfAttest
                   // textClass="text-white"
@@ -395,11 +449,13 @@ const CvOutputPage = () => {
                   <div className="flex flex-col  mt-2 gap-5 md:gap-3 ">
                     {cvData.skills.length > 0 &&
                       cvData.skills.map((skill) => {
-                        const isSelfAttested =
-                          cvData.skillsVerifications[skill].isSelfAttested ||
-                          false;
-                        const mailStatus=cvData.skillsVerifications[skill].mailStatus;
-                        const hash= cvData.skillsVerifications[skill].proof;
+                        // const isSelfAttested =
+                        //   cvData.skillsVerifications[skill.skillName]
+                        //     .isSelfAttested || false;
+                        const isSelfAttested = true;
+                        const mailStatus =
+                          cvData.skillsVerifications[skill.skillName]
+                            .mailStatus;
                         return (
                           <div>
                             {/* <div
@@ -409,11 +465,11 @@ const CvOutputPage = () => {
                           {skill}
                         </div> */}
                             <ShowAnimatedVerifications
-                              firstButtonText={skill}
+                              firstButtonText={skill.skillName}
                               // buttonClass="text-sm lg:text-base"
                               isSelfAttested={isSelfAttested}
                               mailStatus={mailStatus}
-                              hash={hash}
+                              hash={cvData?.skillsVerifications?.[skill.skillName]?.proof}
                             />
                           </div>
                         );
@@ -425,14 +481,16 @@ const CvOutputPage = () => {
               {/* experience */}
               <div className="mt-5">
                 {/* title */}
-                <div className="flex items-center gap-5">
-                  <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center">
-                    <BiSolidBriefcase size={20} />
+                {cvData.experience.length > 0 && (
+                  <div className="flex items-center gap-5">
+                    <div className="h-10 w-10 bg-[#FB980E] rounded-full text-white flex items-center justify-center">
+                      <BiSolidBriefcase size={20} />
+                    </div>
+                    <h1 className="text-2xl font-semibold tracking-wider uppercase">
+                      Work Experience
+                    </h1>
                   </div>
-                  <h1 className="text-2xl font-semibold tracking-wider uppercase">
-                    Work Experience
-                  </h1>
-                </div>
+                )}
 
                 {/* experience cards */}
                 <div className="relative">
@@ -440,11 +498,14 @@ const CvOutputPage = () => {
 
                   {cvData.experience.map((exp, index) => {
                     const verificationKey = exp.company_name;
-                    const isSeflAtetsted =
+                    // const isSeflAtetsted =
+                    //   cvData.experienceVerifications[verificationKey]
+                    //     .isSelfAttested || false;
+                    const isSeflAtetsted = true;
+                    const mailStatus =
                       cvData.experienceVerifications[verificationKey]
-                        .isSelfAttested || false;
-                    const mailStatus= cvData.experienceVerifications[verificationKey].mailStatus
-                    const hash= cvData.experienceVerifications[verificationKey].proof
+                        .mailStatus;
+                    const hash = exp.experienceCertUrl;
                     return (
                       <div
                         key={index}
@@ -462,21 +523,36 @@ const CvOutputPage = () => {
                             </h1>
                             <div className="flex flex-col">
                               <p className="text-sm md:text-lg capitalize line-clamp-1">
-                                {exp.company_name}
+                                {exp.company_name}{" "}
+                                {hash && (
+                                  <a
+                                    href={`${
+                                      import.meta.env.VITE_AzureGATWAY
+                                    }/${hash}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-[#FB980E] font-semibold text-sm"
+                                  >
+                                    🔗
+                                  </a>
+                                )}
                               </p>{" "}
                               <ShowVerifications
                                 isAttested={isSeflAtetsted}
                                 mailStatus={mailStatus}
-                                hash={hash}
+                                hash={cvData?.experienceVerifications?.[verificationKey]?.proof}
                                 className="ml-5 mt-1"
                               />
                             </div>
                           </div>
                           {/* duration */}
+                          {/* yash */}
                           <div className="">
                             <p className="text-[#006666] italic text-xs md:text-base text-nowrap">
                               <>
-                                {exp.duration.from} - {exp.duration.to}
+                                {/* {exp.duration.from} - {exp.duration.to} */}
+                                {formatDate(exp.duration.from)} -{" "}
+                                {formatDate(exp.duration.to)}
                               </>
                             </p>
                           </div>
@@ -521,9 +597,10 @@ const CvOutputPage = () => {
                             const verificationKey = award.award_name;
                             const isSelfAttetsted =
                               cvData.awardVerifications[verificationKey]
-                                .isSelfAttested || false;
-                            const hash=cvData.awardVerifications[verificationKey].proof
-                            const mailStatus=cvData.awardVerifications[verificationKey].mailStatus
+                                .isSelfAttested || true;
+                            const mailStatus =
+                              cvData.awardVerifications[verificationKey]
+                                .mailStatus;
                             return (
                               <div key={index} className="flex flex-col ml-3">
                                 <div className="flex justify-between">
@@ -534,7 +611,7 @@ const CvOutputPage = () => {
                                       className={`absolute bg-[#FB980E] h-3 w-3 rounded-full top-2 left-[-17px]`}
                                     ></div>
                                     <h1 className="text-md md:text-xl font-semibold tracking-tight line-clamp-1">
-                                      {award.award_name}
+                                      {award.award_name}{" "}
                                     </h1>
                                     <div className="flex flex-col">
                                       <p className="text-sm md:text-lg capitalize line-clamp-1 mb-1">
@@ -543,7 +620,7 @@ const CvOutputPage = () => {
                                       <ShowVerifications
                                         isAttested={isSelfAttetsted}
                                         mailStatus={mailStatus}
-                                        hash={hash}
+                                        hash={cvData?.awardVerifications?.[award.award_name]?.proof}
                                         className="ml-5 mt-1"
                                       />
                                     </div>
@@ -584,7 +661,7 @@ const CvOutputPage = () => {
                               const verificationKey = project.project_name;
                               const isSelfAttested =
                                 cvData.projectsVerifications[verificationKey]
-                                  .isSelfAttested || false;
+                                  .isSelfAttested || true;
                               return (
                                 <div key={index} className="flex flex-col ml-3">
                                   <div className="flex justify-between">
@@ -596,22 +673,23 @@ const CvOutputPage = () => {
                                       ></div>
                                       <div className="flex flex-col">
                                         <h1 className="text-md md:text-xl font-semibold tracking-tight line-clamp-2">
-                                          {project.project_name}
+                                          {project.project_name}{" "}
+                                          {project.project_url && (
+                                            <a
+                                              href={project.project_url}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="text-[#FB980E] font-semibold text-sm"
+                                            >
+                                              🔗
+                                            </a>
+                                          )}
                                         </h1>
                                         <ShowVerifications
                                           isAttested={isSelfAttested}
                                           className="ml-5 mt-1"
                                         />
                                       </div>
-                                      {project.project_url && (
-                                        <a
-                                          href={project.project_url}
-                                          target="_blank"
-                                          className="hover:underline text-blue-600 cursor-pointer text-sm font-medium text-nowrap mt-5 lg:mt-0"
-                                        >
-                                          Live link
-                                        </a>
-                                      )}
                                     </div>
                                     {/* duration */}
                                     <div className="">
@@ -654,9 +732,10 @@ const CvOutputPage = () => {
                             const verificationKey = course.course_name;
                             const isSelfAttested =
                               cvData.courseVerifications[verificationKey]
-                                .isSelfAttested || false;
-                            const mailStatus=cvData.courseVerifications[verificationKey].mailStatus
-                            const hash=cvData.courseVerifications[verificationKey].proof
+                                .isSelfAttested || true;
+                            const mailStatus =
+                              cvData.courseVerifications[verificationKey]
+                                .mailStatus;
                             return (
                               <div key={index} className="flex flex-col ml-3">
                                 <div className="flex justify-between">
@@ -671,12 +750,12 @@ const CvOutputPage = () => {
                                     </h1>
                                     <div className="flex flex-col mb-1">
                                       <p className="text-sm md:text-lg capitalize line-clamp-1">
-                                        {course.organization}
+                                        {course.organization}{" "}
                                       </p>
                                       <ShowVerifications
                                         isAttested={isSelfAttested}
                                         mailStatus={mailStatus}
-                                        hash={hash}
+                                        hash={cvData?.courseVerifications?.[course.course_name]?.proof}
                                         className="ml-5 mt-1"
                                       />
                                     </div>

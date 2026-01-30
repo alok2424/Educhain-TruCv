@@ -35,7 +35,6 @@ const Home:React.FC<{handlerLogout:()=>void}> = ({handlerLogout}) => {
               <button
               onClick={handlerLogout}
                 className="w-full bg-white text-[20px] px-6 py-4 font-bold text-center rounded-lg text-[#03257e] hover:text-[#f14419]"
-                
               >
                 Logout
               </button>
